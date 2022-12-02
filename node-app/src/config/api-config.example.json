@@ -1,0 +1,35 @@
+{
+	"local": {
+		"host": "http://localhost",
+		"port": 8282,
+		"endpoints": {
+			"stripeSuccessUrl": "",
+			"stripeFailedUrl": ""
+		},
+		"keys": {
+			"stripe": ""
+		}
+	},
+	"development": {
+		"host": "",
+		"port": 0,
+		"endpoints": {
+			"stripeSuccessUrl": "",
+			"stripeFailedUrl": ""
+		},
+		"keys": {
+			"stripe": ""
+		}
+	},
+	"production": {
+		"host": "",
+		"port": 0,
+		"endpoints": {
+			"stripeSuccessUrl": "",
+			"stripeFailedUrl": ""
+		},
+		"keys": {
+			"stripe": ""
+		}
+	}
+}

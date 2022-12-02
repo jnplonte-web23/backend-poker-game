@@ -1,0 +1,62 @@
+{
+	"name": "poker-api",
+	"description": "poker api",
+	"version": "1.0.0",
+	"main": "index.js",
+	"private": true,
+	"keywords": [],
+	"author": "john paul onte <jnpl.onte@gmail.com>",
+	"license": "MIT",
+	"quokka": {
+		"babel": true
+	},
+	"scripts": {
+		"build": "concurrently \"npm run generate:app\" \"npm run generate:config\" \"npm run generate:docs\"",
+		"generate:app": "tsc --project ./tsconfig.json",
+		"generate:config": "copyfiles -u 1 ./src/config/*.json ./dist",
+		"generate:docs": "apidoc -i ./src/ -o ./dist/doc/ -f .ts",
+		"start": "concurrently \"tsc --watch\" \"nodemon ./dist/index.js\"",
+		"start:server": "node ./dist/index.js",
+		"test": "concurrently \"tsc\" \"PORT=8883 TEST_DIR='./dist/doc' ARTIFACTS_DIR='./dist/doc' COVERAGE_DIR='./dist/doc' mocha dist/**/*.spec.js --timeout 100000 --exit\"",
+		"lint": "tslint -c ./tslint.json './src/**/*.ts' -e './src/**/*.spec.ts'",
+		"watch": "tsc --watch"
+	},
+	"dependencies": {
+		"@types/chai": "^4.3.3",
+		"@types/express": "^4.17.14",
+		"@types/express-serve-static-core": "^4.17.31",
+		"@types/mocha": "^10.0.0",
+		"@types/node": "^18.11.3",
+		"@types/sequelize": "^4.28.14",
+		"@typescript-eslint/eslint-plugin": "^5.40.1",
+		"@typescript-eslint/eslint-plugin-tslint": "^5.40.1",
+		"@typescript-eslint/parser": "^5.40.1",
+		"apidoc": "^0.29.0",
+		"axios": "^1.1.3",
+		"body-parser": "^1.20.1",
+		"compression": "^1.7.4",
+		"concurrently": "^7.4.0",
+		"copyfiles": "^2.4.1",
+		"cors": "^2.8.5",
+		"crypto-js": "^4.1.1",
+		"express": "^4.18.2",
+		"express-csp-header": "^5.1.0",
+		"fsevents": "^2.3.2",
+		"helmet": "^6.0.0",
+		"jnpl-helper": "^1.5.20",
+		"reflect-metadata": "^0.1.13",
+		"stripe": "^10.15.0",
+		"ts-node": "^10.9.1",
+		"typescript": "^4.8.4",
+		"uuid": "^9.0.0"
+	},
+	"devDependencies": {
+		"chai": "^4.3.6",
+		"cross-env": "^7.0.3",
+		"eslint": "^8.25.0",
+		"mocha": "^10.1.0",
+		"nock": "^13.2.9",
+		"nodemon": "^2.0.20",
+		"supertest": "^6.3.0"
+	}
+}

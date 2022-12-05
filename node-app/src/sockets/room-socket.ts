@@ -1,11 +1,14 @@
-import { Helper } from '../app/services/helper/helper.service';
 import { ApiResponse } from '../app/services/api-response/api-response.service';
+import { Mongo } from '../app/services/mongo/mongo.service';
+import { Helper } from '../app/services/helper/helper.service';
 
-import { Test } from '../app/v1/core/test/test.component';
+// import { Test } from '../app/v1/core/test/test.component';
+import { UsersRoom } from '../app/v1/core/users/users-room.component';
 
 export function setup(app, io, config, mongoModels): void {
 	const response = new ApiResponse(),
-		helper = new Helper(config);
+		helper = new Helper(config),
+		mongo = new Mongo(config);
 
 	const roomIO = io.of('/room');
 
@@ -68,8 +71,8 @@ export function setup(app, io, config, mongoModels): void {
 			next();
 		});
 
-		// new UserAlert(appCore, response, helper, query, roomIO);
-		new Test(appCore, response);
+		// new Test(appCore, response);
+		new UsersRoom(appCore, response, helper, mongo, roomIO);
 	});
 
 	return app;

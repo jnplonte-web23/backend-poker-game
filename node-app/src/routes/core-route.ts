@@ -1,11 +1,14 @@
 import { ApiResponse } from '../app/services/api-response/api-response.service';
+import { Mongo } from '../app/services/mongo/mongo.service';
 import { Helper } from '../app/services/helper/helper.service';
 
-import { Test } from '../app/v1/core/test/test.component';
+// import { Test } from '../app/v1/core/test/test.component';
+import { Users } from '../app/v1/core/users/users.component';
 
 export function setup(app, config, mongoModels) {
 	const response = new ApiResponse(),
-		helper = new Helper(config);
+		helper = new Helper(config),
+		mongo = new Mongo(config);
 
 	app.version('v1/core', (appCore) => {
 		appCore.use((req, res, next) => {
@@ -27,7 +30,8 @@ export function setup(app, config, mongoModels) {
 			next();
 		});
 
-		new Test(appCore, response);
+		// new Test(appCore, response);
+		new Users(appCore, response, helper, mongo);
 	});
 
 	return app;

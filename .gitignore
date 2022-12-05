@@ -45,6 +45,7 @@ pm2-output*
 test.js
 
 node-app/src/config/api-config.json
+node-app/src/config/mongo-config.json
 
 node-app/node_modules
 node-app/dist

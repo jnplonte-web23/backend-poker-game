@@ -3,12 +3,12 @@ import { Helper } from '../app/services/helper/helper.service';
 
 import { Test } from '../app/v1/core/test/test.component';
 
-export function setup(app, config) {
+export function setup(app, config, mongoModels) {
 	const response = new ApiResponse(),
 		helper = new Helper(config);
 
-	app.version('v1/core', (appMain) => {
-		appMain.use((req, res, next) => {
+	app.version('v1/core', (appCore) => {
+		appCore.use((req, res, next) => {
 			res.startTime = new Date().getTime();
 			if (
 				typeof req.headers === 'undefined' ||
@@ -18,10 +18,16 @@ export function setup(app, config) {
 				return response.failed(res, 'token', '', 401);
 			}
 
+			req.mongoModels = mongoModels;
+
+			if (!req.mongoModels) {
+				return response.failed(res, 'model', '', 500);
+			}
+
 			next();
 		});
 
-		new Test(appMain, response);
+		new Test(appCore, response);
 	});
 
 	return app;

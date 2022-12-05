@@ -2,34 +2,19 @@
 	"local": {
 		"host": "http://localhost",
 		"port": 8282,
-		"endpoints": {
-			"stripeSuccessUrl": "",
-			"stripeFailedUrl": ""
-		},
-		"keys": {
-			"stripe": ""
-		}
+		"endpoints": {},
+		"keys": {}
 	},
 	"development": {
 		"host": "",
 		"port": 0,
-		"endpoints": {
-			"stripeSuccessUrl": "",
-			"stripeFailedUrl": ""
-		},
-		"keys": {
-			"stripe": ""
-		}
+		"endpoints": {},
+		"keys": {}
 	},
 	"production": {
 		"host": "",
 		"port": 0,
-		"endpoints": {
-			"stripeSuccessUrl": "",
-			"stripeFailedUrl": ""
-		},
-		"keys": {
-			"stripe": ""
-		}
+		"endpoints": {},
+		"keys": {}
 	}
 }

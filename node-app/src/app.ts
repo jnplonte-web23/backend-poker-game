@@ -2,9 +2,15 @@ import * as express from 'express';
 import * as helmet from 'helmet';
 import * as compression from 'compression';
 import * as cors from 'cors';
+import * as http from 'http';
+
+import { Server } from 'socket.io';
 import { expressCspHeader, SELF, EVAL } from 'express-csp-header';
 
 import * as coreRoutes from './routes/core-route';
+import * as roomSockets from './sockets/room-socket';
+
+import { mongoSetup } from './models';
 
 import { baseConfig } from './config';
 
@@ -24,8 +30,11 @@ express['application']['version'] = express.Router['group'] = function (arg1, ar
 	return router;
 };
 
+const mongo = mongoSetup();
+
 class App {
 	public express;
+	public server;
 	public env = process.env.NODE_ENV || 'local';
 
 	constructor() {
@@ -34,7 +43,10 @@ class App {
 
 		this.addConfig();
 		this.implementDocumentation();
+
 		this.setRoute();
+		this.setSocket();
+
 		this.setNotFound();
 	}
 
@@ -64,7 +76,14 @@ class App {
 	}
 
 	private setRoute(): void {
-		this.express = coreRoutes.setup(this.express, baseConfig);
+		this.express = coreRoutes.setup(this.express, baseConfig, mongo);
+	}
+
+	private setSocket(): void {
+		this.server = http.createServer(this.express);
+		const io = new Server(this.server);
+
+		this.express = roomSockets.setup(this.express, io, baseConfig, mongo);
 	}
 
 	private setNotFound(): void {
@@ -79,4 +98,4 @@ class App {
 	}
 }
 
-export default new App().express;
+export default new App().server;

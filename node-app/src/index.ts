@@ -3,10 +3,11 @@ import { baseConfig } from './config';
 
 const env = process.env.NODE_ENV || 'local';
 
-const server = app.listen(baseConfig.api[env].port, (error) => {
-	if (error) {
-		return console.log(error);
+app.listen(baseConfig.api[env].port, (_error) => {
+	if (_error) {
+		return console.log(_error);
 	}
 	console.log('api environment is %s', env.toUpperCase());
-	console.log('api listening to http://localhost:%s', server.address().port);
+
+	console.log('api listening to http://localhost:%s', baseConfig.api[env].port);
 });

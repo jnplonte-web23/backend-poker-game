@@ -6,7 +6,7 @@ It represents the closest reasonable ESLint configuration to this
 project's original TSLint configuration.
 
 We recommend eventually switching this configuration to extend from
-the recommended rulesets in typescript-eslint.
+the recommended rulesets in typescript-eslint. 
 https://github.com/typescript-eslint/tslint-to-eslint-config/blob/master/docs/FAQs.md
 
 Happy linting! 💖
@@ -19,8 +19,7 @@ module.exports = {
 	},
 	parser: '@typescript-eslint/parser',
 	parserOptions: {
-		project: 'tsconfig.eslint.json',
-		tsconfigRootDir: __dirname,
+		project: 'tsconfig.json',
 		sourceType: 'module',
 	},
 	plugins: ['@typescript-eslint', '@typescript-eslint/tslint'],
@@ -75,13 +74,7 @@ module.exports = {
 		'guard-for-in': 'error',
 		'id-blacklist': 'off',
 		'id-match': 'off',
-		indent: [
-			2,
-			'tab',
-			{
-				SwitchCase: 1,
-			},
-		],
+		indent: [2, 'tab'],
 		'max-len': [
 			'error',
 			{

@@ -2,8 +2,8 @@ import * as express from 'express';
 import * as helmet from 'helmet';
 import * as compression from 'compression';
 import * as cors from 'cors';
-import * as http from 'http';
 
+import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { expressCspHeader, SELF, EVAL } from 'express-csp-header';
 
@@ -35,17 +35,25 @@ const mongo = mongoSetup();
 class App {
 	public express;
 	public server;
+	public io;
 	public env = process.env.NODE_ENV || 'local';
 
 	constructor() {
 		this.express = express();
 		this.express.disable('x-powered-by');
 
+		this.server = createServer(this.express);
+		this.io = new Server(this.server, {
+			cors: {
+				origin: baseConfig.socketWhiteList || '*',
+				credentials: true,
+			},
+		});
+
 		this.addConfig();
 		this.implementDocumentation();
 
 		this.setRoute();
-		this.setSocket();
 
 		this.setNotFound();
 	}
@@ -76,14 +84,8 @@ class App {
 	}
 
 	private setRoute(): void {
-		this.express = coreRoutes.setup(this.express, baseConfig, mongo);
-	}
-
-	private setSocket(): void {
-		this.server = http.createServer(this.express);
-		const io = new Server(this.server);
-
-		this.express = roomSockets.setup(this.express, io, baseConfig, mongo);
+		const ioRoom = roomSockets.setup(this.io, baseConfig);
+		this.express = coreRoutes.setup(this.express, ioRoom, baseConfig, mongo);
 	}
 
 	private setNotFound(): void {

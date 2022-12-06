@@ -82,13 +82,14 @@ export class ApiResponse {
 		return res.status ? res.status(status || 200).json(resData) : resData;
 	}
 
-	failed(res: Response, param: string, data: any = '', error: number = 400): any {
+	failed(res: Response | object, param: string, data: any = '', error: number = 400): any {
+		const errorData: any = data.name || data.code ? this.getError(data.name || data.code) : data;
 		const resData = {
 			status: 'failed',
 			message: this.getMessage(`${param}-failed`),
-			executionTime: res.startTime ? (new Date().getTime() - res.startTime) / 1000 : 0,
-			data: this.env === 'production' ? this.getError(data.name || data.code) : data,
+			executionTime: res['startTime'] ? (new Date().getTime() - res['startTime']) / 1000 : 0,
+			data: errorData.length === 1 && errorData[0] === '' ? [] : errorData,
 		};
-		return res.status ? res.status(error || 400).json(resData) : resData;
+		return res['status'] ? res['status'](error || 400).json(resData) : resData;
 	}
 }

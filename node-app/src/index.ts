@@ -3,9 +3,9 @@ import { baseConfig } from './config';
 
 const env = process.env.NODE_ENV || 'local';
 
-app.listen(baseConfig.api[env].port, (_error) => {
-	if (_error) {
-		return console.log(_error);
+app.listen(baseConfig.api[env].port, (error) => {
+	if (error) {
+		return console.log(error);
 	}
 	console.log('api environment is %s', env.toUpperCase());
 

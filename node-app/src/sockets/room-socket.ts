@@ -1,79 +1,85 @@
-import { ApiResponse } from '../app/services/api-response/api-response.service';
-import { Mongo } from '../app/services/mongo/mongo.service';
 import { Helper } from '../app/services/helper/helper.service';
+import { ApiResponse } from '../app/services/api-response/api-response.service';
 
-// import { Test } from '../app/v1/core/test/test.component';
-import { UsersRoom } from '../app/v1/core/users/users-room.component';
-
-export function setup(app, io, config, mongoModels): void {
+export function setup(io, config) {
 	const response = new ApiResponse(),
-		helper = new Helper(config),
-		mongo = new Mongo(config);
+		helper = new Helper(config);
 
-	const roomIO = io.of('/room');
+	const verifyUser = (socket, next) => {
+		if (
+			typeof socket.handshake.headers === 'undefined' ||
+			helper.isEmpty(socket.handshake.headers[config.secretKey]) ||
+			Buffer.from(socket.handshake.headers[config.secretKey], 'base64').toString('ascii') !== config.secretKeyHash
+		) {
+			next(new Error(helper.toString(response.failed({}, 'token', '', 401))));
+			return;
+		}
 
-	roomIO['users'] = {};
-	roomIO['usersRoom'] = {};
+		next();
+	};
 
-	roomIO
-		.use((socket, next) => {
-			if (typeof socket.handshake.query === 'undefined' || helper.isEmpty(socket.handshake.query[config.secretKey])) {
-				return next(new Error('Invalid Authentication Token'));
+	const ioName = io.of('v1/room/poker');
+	ioName.use(verifyUser);
+
+	ioName['userData'] = [];
+
+	ioName.on('connection', (socket) => {
+		const roomName: string = `ROOM:${socket.handshake.query.roomId}`;
+		const walletId: string | null = socket.handshake.query.walletId || null;
+		const userName: string | null = socket.handshake.query.userName || null;
+
+		if (walletId) {
+			socket.join(roomName);
+
+			const room = socket.adapter.rooms.get(roomName);
+			const usersOnRoom: string[] = [];
+			if (room) {
+				for (const clientId of room) {
+					usersOnRoom.push(clientId);
+				}
 			}
 
-			if (Buffer.from(socket.handshake.query[config.secretKey], 'base64').toString('ascii') !== config.secretKeyHash) {
-				return next(new Error('Invalid Authentication Token'));
-			}
-
-			roomIO['users'] = {
-				roomId: socket.handshake.query['roomId'] || null,
-				walletId: socket.handshake.query['walletId'] || null,
-				userName: socket.handshake.query['userName'] || null,
-			};
-
-			if (!roomIO['users']['roomId'] || !roomIO['users']['walletId'] || !roomIO['users']['userName']) {
-				return next(new Error('Invalid Authentication Token'));
-			}
-
-			next();
-		})
-		.on('connection', (socket) => {
-			roomIO['usersRoom'][roomIO['users']['walletId'] || 'NONE'] = socket.id;
-
-			if (socket.handshake.query['roomId']) {
-				const roomNumber: string = socket.handshake.query['roomId'];
-				socket.join(`ROOM${decodeURIComponent(roomNumber)}`);
-			}
-
-			socket.on('disconnect', function () {
-				delete roomIO['usersRoom'][roomIO['users']['walletId'] || 'NONE'];
+			ioName['userData'].push({
+				userId: socket.id,
+				walletId: walletId,
+				userName: userName,
 			});
-		});
 
-	app.version('v1/room', (appCore) => {
-		appCore.use((req, res, next) => {
-			res.startTime = new Date().getTime();
+			ioName.in(roomName).emit('connected', {
+				status: 'success',
+				message: 'Connection Success',
+				executionTime: 0,
+				data: {
+					userData: ioName['userData'].filter((uData) => usersOnRoom.includes(uData['userId'])),
+				},
+			});
+			console.log('USER CONNECTED ON ROOM', roomName, usersOnRoom);
+		}
 
-			if (
-				typeof req.headers === 'undefined' ||
-				helper.isEmpty(req.headers[config.secretKey]) ||
-				Buffer.from(req.headers[config.secretKey], 'base64').toString('ascii') !== config.secretKeyHash
-			) {
-				return response.failed(res, 'token', '', 401);
+		socket.on('disconnect', () => {
+			const roomDc = socket.adapter.rooms.get(roomName);
+			const usersOnRoomDc: string[] = [];
+			if (roomDc) {
+				for (const clientDcId of roomDc) {
+					usersOnRoomDc.push(clientDcId);
+				}
 			}
 
-			req.mongoModels = mongoModels;
-
-			if (!req.mongoModels) {
-				return response.failed(res, 'model', '', 500);
+			if (ioName['userData'].length >= 1) {
+				ioName['userData'] = ioName['userData'].filter((uData) => usersOnRoomDc.includes(uData['userId']));
 			}
 
-			next();
+			ioName.in(roomName).emit('connected', {
+				status: 'success',
+				message: 'Disconnection Success',
+				executionTime: 0,
+				data: {
+					userData: ioName['userData'].filter((uData) => usersOnRoomDc.includes(uData['userId'])),
+				},
+			});
+			console.log('USER DISCONNECTED ON ROOM', roomName, usersOnRoomDc);
 		});
-
-		// new Test(appCore, response);
-		new UsersRoom(appCore, response, helper, mongo, roomIO);
 	});
 
-	return app;
+	return ioName;
 }

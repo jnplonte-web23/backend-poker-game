@@ -5,7 +5,7 @@ import { Helper } from '../app/services/helper/helper.service';
 // import { Test } from '../app/v1/core/test/test.component';
 import { Users } from '../app/v1/core/users/users.component';
 
-export function setup(app, config, mongoModels) {
+export function setup(app, ioRoom, config, mongoModels) {
 	const response = new ApiResponse(),
 		helper = new Helper(config),
 		mongo = new Mongo(config);
@@ -31,7 +31,7 @@ export function setup(app, config, mongoModels) {
 		});
 
 		// new Test(appCore, response);
-		new Users(appCore, response, helper, mongo);
+		new Users(appCore, response, helper, ioRoom, mongo);
 	});
 
 	return app;

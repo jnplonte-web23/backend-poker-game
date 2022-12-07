@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { CoreMiddleware } from '../../../middlewares/core/core.middleware';
 
 export class Users extends CoreMiddleware {
-	constructor(app, private response, private helper, private io, private mongo) {
+	constructor(app, private response, private helper, private mongo) {
 		super(app);
 	}
 

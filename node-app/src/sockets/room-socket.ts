@@ -27,6 +27,7 @@ export function setup(io, config) {
 		const roomName: string = `ROOM:${socket.handshake.query.roomId}`;
 		const walletId: string | null = socket.handshake.query.walletId || null;
 		const userName: string | null = socket.handshake.query.userName || null;
+		const playerNumber: number | null = Number(socket.handshake.query.playerNumber || 0);
 
 		if (walletId) {
 			socket.join(roomName);
@@ -43,6 +44,7 @@ export function setup(io, config) {
 				userId: socket.id,
 				walletId: walletId,
 				userName: userName,
+				playerNumber: playerNumber,
 			});
 
 			ioName.in(roomName).emit('connected', {

@@ -24,6 +24,7 @@ export function mongoSetup() {
 		mongoose.set('debug', true);
 	}
 
+	mongoose.set('strictQuery', true);
 	if (mongoose.connection.readyState === 0) {
 		const mongoOptions: any = {
 			useNewUrlParser: true,

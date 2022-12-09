@@ -14,6 +14,9 @@ import { mongoSetup } from './models';
 
 import { baseConfig } from './config';
 
+import { Timer } from './app/services/timer/timer.service';
+import { PlayerTurn } from './app/services/player-turn/player-turn.service';
+
 express['application']['version'] = express.Router['group'] = function (arg1, arg2) {
 	let fn, path;
 	const router = express.Router(),
@@ -33,6 +36,9 @@ express['application']['version'] = express.Router['group'] = function (arg1, ar
 const mongo = mongoSetup();
 
 class App {
+	public timer: Timer = new Timer();
+	public playerTurn: PlayerTurn = new PlayerTurn();
+
 	public express;
 	public server;
 	public io;
@@ -84,8 +90,8 @@ class App {
 	}
 
 	private setRoute(): void {
-		const ioRoom = roomSockets.setup(this.io, baseConfig);
-		this.express = coreRoutes.setup(this.express, ioRoom, baseConfig, mongo);
+		const ioRoom = roomSockets.setup(this.timer, this.io, baseConfig);
+		this.express = coreRoutes.setup(this.express, this.timer, ioRoom, baseConfig, mongo);
 	}
 
 	private setNotFound(): void {

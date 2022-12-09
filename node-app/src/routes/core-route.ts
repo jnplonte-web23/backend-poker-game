@@ -6,7 +6,7 @@ import { Helper } from '../app/services/helper/helper.service';
 import { Users } from '../app/v1/core/users/users.component';
 import { Events } from '../app/v1/core/events/events.component';
 
-export function setup(app, ioRoom, config, mongoModels) {
+export function setup(app, timer, ioRoom, config, mongoModels) {
 	const response = new ApiResponse(),
 		helper = new Helper(config),
 		mongo = new Mongo(config);
@@ -33,7 +33,7 @@ export function setup(app, ioRoom, config, mongoModels) {
 
 		// new Test(appCore, response);
 		new Users(appCore, response, helper, mongo);
-		new Events(appCore, response, helper, ioRoom, mongo);
+		new Events(appCore, response, helper, timer, ioRoom, mongo);
 	});
 
 	return app;

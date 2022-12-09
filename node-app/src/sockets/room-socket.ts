@@ -1,7 +1,7 @@
 import { Helper } from '../app/services/helper/helper.service';
 import { ApiResponse } from '../app/services/api-response/api-response.service';
 
-export function setup(io, config) {
+export function setup(timer, io, config) {
 	const response = new ApiResponse(),
 		helper = new Helper(config);
 
@@ -29,10 +29,11 @@ export function setup(io, config) {
 		const userName: string | null = socket.handshake.query.userName || null;
 		const playerNumber: number | null = Number(socket.handshake.query.playerNumber || 0);
 
-		if (walletId) {
+		if (walletId && Number(socket.handshake.query.roomId) >= 1) {
 			socket.join(roomName);
 
 			const room = socket.adapter.rooms.get(roomName);
+
 			const usersOnRoom: string[] = [];
 			if (room) {
 				for (const clientId of room) {
@@ -55,6 +56,16 @@ export function setup(io, config) {
 					userData: ioName['userData'].filter((uData) => usersOnRoom.includes(uData['userId'])),
 				},
 			});
+
+			if (usersOnRoom.length === 1) {
+				timer.setTimer(roomName, 30);
+				setInterval(() => {
+					timer.setTimer(roomName, timer.getTimer(roomName) - 1);
+
+					ioName.in(roomName).emit('timer', { room: roomName, countdown: timer.getTimer(roomName) });
+				}, 1000);
+			}
+
 			console.log('USER CONNECTED ON ROOM', roomName, usersOnRoom);
 		}
 

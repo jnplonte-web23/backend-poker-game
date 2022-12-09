@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { CoreMiddleware } from '../../../middlewares/core/core.middleware';
 
 export class Events extends CoreMiddleware {
-	constructor(app, private response, private helper, private io, private mongo) {
+	constructor(app, private response, private helper, private timer, private io, private mongo) {
 		super(app);
 	}
 
@@ -24,6 +24,8 @@ export class Events extends CoreMiddleware {
 		}
 
 		const roomName: string = `ROOM:${req.body['roomId']}`;
+
+		this.timer.setTimer(roomName, 101);
 		this.io.to(roomName).emit('start-game', this.response.success({}, 'start-game', req.body['data']));
 
 		// DB logic here
@@ -38,6 +40,8 @@ export class Events extends CoreMiddleware {
 		}
 
 		const roomName: string = `ROOM:${req.body['roomId']}`;
+
+		this.timer.setTimer(roomName, 0);
 		this.io.to(roomName).emit('end-game', this.response.success({}, 'end-game', req.body['data']));
 
 		// DB logic here
@@ -52,6 +56,8 @@ export class Events extends CoreMiddleware {
 		}
 
 		const roomName: string = `ROOM:${req.body['roomId']}`;
+
+		this.timer.setTimer(roomName, 31);
 		this.io.to(roomName).emit('bet', this.response.success({}, 'bet', req.body['data']));
 
 		// DB logic here
@@ -66,6 +72,8 @@ export class Events extends CoreMiddleware {
 		}
 
 		const roomName: string = `ROOM:${req.body['roomId']}`;
+
+		this.timer.setTimer(roomName, 31);
 		this.io.to(roomName).emit('call', this.response.success({}, 'call', req.body['data']));
 
 		// DB logic here
@@ -80,6 +88,8 @@ export class Events extends CoreMiddleware {
 		}
 
 		const roomName: string = `ROOM:${req.body['roomId']}`;
+
+		this.timer.setTimer(roomName, 31);
 		this.io.to(roomName).emit('fold', this.response.success({}, 'fold', req.body['data']));
 
 		// DB logic here
@@ -94,6 +104,8 @@ export class Events extends CoreMiddleware {
 		}
 
 		const roomName: string = `ROOM:${req.body['roomId']}`;
+
+		this.timer.setTimer(roomName, 31);
 		this.io.to(roomName).emit('all-in', this.response.success({}, 'all-in', req.body['data']));
 
 		// DB logic here

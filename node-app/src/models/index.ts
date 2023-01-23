@@ -30,10 +30,13 @@ export function mongoSetup() {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 		};
-		mongoose.connect(
-			`mongodb://${config['username']}:${config['password']}@${config['host']}:${config['port']}/${config['database']}`,
-			mongoOptions
-		);
+
+		let mongoString: string = `mongodb://${config['host']}:${config['port']}/${config['database']}`;
+		if (config['username'] !== '' && config['password'] !== '') {
+			mongoString = `mongodb://${config['username']}:${config['password']}@${config['host']}:${config['port']}/${config['database']}`;
+		}
+
+		mongoose.connect(mongoString, mongoOptions);
 		mongoose.connection.on('connected', (err) => {
 			if (err) {
 				console.error('mongo connection error:', err);

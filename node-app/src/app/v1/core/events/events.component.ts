@@ -4,6 +4,8 @@ import { CoreMiddleware } from '../../../middlewares/core/core.middleware';
 export class Events extends CoreMiddleware {
 	constructor(app, private response, private helper, private timer, private io, private mongo) {
 		super(app);
+
+		console.log(this.mongo);
 	}
 
 	get services() {
